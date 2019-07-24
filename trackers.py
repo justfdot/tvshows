@@ -215,16 +215,24 @@ class Kinozal(Tracker):
     PAGE_URL = 'http://kinozal.tv/details.php?id='
     DOWNLOAD_URL = 'http://dl.kinozal.tv/download.php?id='
     EPISODES_RANGE_REGEX = re.compile(r'\d+-(\d+) серии из (\d+|\?+)')
-    LAST_UPDATE_REGEX = re.compile(
-        r'^Торрент-файл обновлен\s+(\d+\s\w+\s\d+|\w+)\sв\s(\d+):(\d+)')
+    LAST_UPDATE_REGEX = re.compile(r'(\d+\s\w+\s\d+|\w+)\sв\s(\d+):(\d+)')
 
     def get_datetime(self, soup):
         _relative_days = {u'сегодня': 0, u'вчера': -1}
         datetime_soup = (soup.find('div', 'mn1_content')
                          .find('div', 'bx1 justify')
                          .find('b').string)
-        _date, _hours, _minutes = (self.LAST_UPDATE_REGEX
-                                   .search(datetime_soup).groups())
+        try:
+            _date, _hours, _minutes = (self.LAST_UPDATE_REGEX
+                                           .search(datetime_soup).groups())
+        except AttributeError:
+            datetime_soup = (soup.find('div', 'mn1_menu')
+                             .find('ul', 'men w200')
+                             .find_all('li')[-1]
+                             .find('span', 'floatright green n').string)
+            _date, _hours, _minutes = (self.LAST_UPDATE_REGEX
+                                           .search(datetime_soup).groups())
+
         if _date in _relative_days:
             return (self.db.now.replace(
                 hour=int(_hours), minute=int(_minutes))
