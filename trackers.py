@@ -219,19 +219,19 @@ class Kinozal(Tracker):
 
     def get_datetime(self, soup):
         _relative_days = {u'сегодня': 0, u'вчера': -1}
-        datetime_soup = (soup.find('div', 'mn1_content')
-                         .find('div', 'bx1 justify')
-                         .find('b').string)
+
         try:
-            _date, _hours, _minutes = (self.LAST_UPDATE_REGEX
-                                           .search(datetime_soup).groups())
+            datetime_soup = (soup.find('div', 'mn1_content')
+                             .find('div', 'bx1 justify')
+                             .find('b', recursive=False).string)
         except AttributeError:
             datetime_soup = (soup.find('div', 'mn1_menu')
                              .find('ul', 'men w200')
                              .find_all('li')[-1]
                              .find('span', 'floatright green n').string)
-            _date, _hours, _minutes = (self.LAST_UPDATE_REGEX
-                                           .search(datetime_soup).groups())
+
+        _date, _hours, _minutes = (self.LAST_UPDATE_REGEX
+                                       .search(datetime_soup).groups())
 
         if _date in _relative_days:
             return (self.db.now.replace(
