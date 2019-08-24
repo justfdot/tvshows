@@ -96,21 +96,25 @@ class Tracker:
             return (self.EPISODES_RANGE_REGEX
                     .search(web_page.h1.a.text).groups())
         except AttributeError:
-            raise TVShowsSkipTopicError(
-                'Couldn\'t find episodes range', self.topic['title'])
             return
 
     def correct_link_name(self, ep_range):
-        return manager.rename_link(
-            self.topic['link'],
-            self.LINK_REGEX.sub(
-                f' [{ep_range[0]}\u2215{ep_range[1]}] ',
-                self.topic['link'].name))
+        try:
+            return manager.rename_link(
+                self.topic['link'],
+                self.LINK_REGEX.sub(
+                    f' [{ep_range[0]}\u2215{ep_range[1]}] ',
+                    self.topic['link'].name))
+        except TypeError:
+            return
 
     def stop_tracking(self, ep_range):
-        if ep_range[1].isdigit() and int(ep_range[0]) == int(ep_range[1]):
-            manager.event_log(f"Stop tracking: {self.topic['title']}")
-            return True
+        try:
+            if ep_range[1].isdigit() and int(ep_range[0]) == int(ep_range[1]):
+                manager.event_log(f"Stop tracking: {self.topic['title']}")
+                return True
+        except TypeError:
+            return False
 
     def make_schedule(self, web_page_update, this_week):
         delta = {'days': 6, 'hours': 22}
@@ -205,7 +209,7 @@ class Rutracker(Tracker):
         return datetime.strptime(
             (soup.find('table', 'attach bordered med')
                  .find_all('tr', limit=2)[1]
-                 .find('li').text.replace('Май', 'Мая')),  # Dirty hack
+                 .find('li').text),  # .replace('Май', 'Мая') Dirty hack
             '%d-%b-%y %H:%M')
 
 
