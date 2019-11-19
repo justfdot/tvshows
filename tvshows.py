@@ -55,6 +55,13 @@ def update(args, db):
 
 
 @with_db
+def remove(args, db):
+    topic = db.get_topic(args['TOPIC'])
+    ucli.info('Remove specified topic:', topic['title'])
+    db.has_changes = db.topics.delete(topic)
+
+
+@with_db
 def list(args, db):
     db.check_sort_field(args['--sortby'])
     topics = db.get_list_topics(args['--sortby'])
