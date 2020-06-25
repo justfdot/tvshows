@@ -1,7 +1,7 @@
 import re
 import requests
-import socks
-import socket
+# import socks
+# import socket
 import hashlib
 import tvshows.manager as manager
 from bencoding import bdecode, bencode
@@ -13,8 +13,8 @@ from locale import setlocale, LC_TIME
 from ucli import ucli
 
 
-socks.set_default_proxy(socks.SOCKS5, 'localhost', 9050)
-socket.socket = socks.socksocket
+# socks.set_default_proxy(socks.SOCKS5, 'localhost', 9050)
+# socket.socket = socks.socksocket
 setlocale(LC_TIME, 'ru_RU.UTF-8')
 
 
@@ -27,6 +27,8 @@ class Tracker:
     def __init__(self, name, db_obj: DBManager):
         self.NAME = name
         self.session = requests.Session()
+        # self.session.proxies = {'http':  'socks5h://127.0.0.1:9050',
+        #                         'https': 'socks5h://127.0.0.1:9050'}
         self.db = db_obj
 
         if not name:
@@ -209,7 +211,8 @@ class Rutracker(Tracker):
         return datetime.strptime(
             (soup.find('table', 'attach bordered med')
                  .find_all('tr', limit=2)[1]
-                 .find('li').text),  # .replace('Май', 'Мая') Dirty hack
+                 # .find('li').text),  # .replace('Май', 'Мая') Dirty hack
+                 .find('li').text).replace('Май', 'Мая'),
             '%d-%b-%y %H:%M')
 
 
