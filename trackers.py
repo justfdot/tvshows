@@ -27,8 +27,8 @@ class Tracker:
     def __init__(self, name, db_obj: DBManager):
         self.NAME = name
         self.session = requests.Session()
-        # self.session.proxies = {'http':  'socks5h://127.0.0.1:9050',
-        #                         'https': 'socks5h://127.0.0.1:9050'}
+        self.session.proxies = {'http':  'socks5h://127.0.0.1:9050',
+                                'https': 'socks5h://127.0.0.1:9050'}
         self.db = db_obj
 
         if not name:
